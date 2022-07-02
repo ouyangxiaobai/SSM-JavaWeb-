@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.szy.dao.UserDao">
+	
+	<select id="findUserByName" parameterType="String" resultType="User">
+		select * from User where name = #{value} 
+	</select>
+	
+	<select id="findUserById" parameterType="Long" resultType="User">
+		select * from User where id = #{value} 
+	</select>
+	
+	<select id="findByName" parameterType="Map" resultType="User">
+		select * from User where name like #{name} LIMIT #{startIndex}, #{pageSize} 
+	</select>
+	
+	<select id="getTotalByName" parameterType="Map" resultType="int">
+		select count(*) from User where name like #{name}  
+	</select>
+	
+	<insert id="add" parameterType="com.szy.entity.User">
+		INSERT INTO User(id,name,password,sex,status,createTime) VALUES(NULL, #{name}, #{password}, #{sex},#{status},#{createTime})
+	</insert>
+	
+	<update id="edit" parameterType="com.szy.entity.User">
+		update User set name = #{name},password = #{password},sex = #{sex},status = #{status} where id = #{id}
+	</update>
+	
+	<update id="delete" parameterType="String">
+		delete from User where id in ${value}
+	</update>
+	
+	<update id="changePwd" parameterType="com.szy.entity.User">
+		update User set password = #{password} where id = #{id}
+	</update>
+	
+</mapper>

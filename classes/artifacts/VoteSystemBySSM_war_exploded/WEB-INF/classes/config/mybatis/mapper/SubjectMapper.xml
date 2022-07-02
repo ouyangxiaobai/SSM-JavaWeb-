@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.szy.dao.SubjectDao">
+	
+	
+	<resultMap id="subjectResult" type="Subject">
+	    <id property="id" column="s_id"/>
+	    <result property="name" column="s_name"/>
+	    <result property="type" column="s_type"/>
+	    <result property="info" column="s_info"/>
+	    <result property="voteNumber" column="s_vote_number"/>
+	    <result property="startTime" column="s_start_time"/>
+	    <result property="endTime" column="s_end_time"/>
+	    <result property="createTime" column="s_create_time"/>
+	    <collection property="subjectItems" ofType="SubjectItem">
+	        <id property="id" column="si_id"/>
+	        <result property="subjectId" column="si_subject_id"/>
+	        <result property="title" column="si_title"/>
+	        <result property="voteNumber" column="si_vote_number"/>
+	        <result property="createTime" column="si_create_time"/>
+	    </collection>
+	</resultMap>
+	
+	
+	<select id="findByRelation" parameterType="Map" resultMap="subjectResult">
+		select 
+			s.id as s_id,s.name as s_name,s.type as s_type,s.info as s_info,s.voteNumber as s_vote_number,s.startTime as s_start_time,s.endTime as s_end_time,s.createTime as s_create_time,
+			si.id as si_id,si.subjectId as si_subject_id,si.title as si_title,si.voteNumber as si_vote_number,si.createTime as si_create_time 
+		from Subject s,Subject_Item si where name like #{name} and s.id = si.subjectId LIMIT #{startIndex}, #{pageSize} 
+	</select>
+	
+	<select id="findByName" parameterType="Map" resultType="Subject">
+		select * from Subject where name like #{name} ORDER BY voteNumber desc  LIMIT #{startIndex}, #{pageSize} 
+	</select>
+	
+	<select id="getTotalByName" parameterType="Map" resultType="int">
+		select count(*) from Subject where name like #{name}  
+	</select>
+	
+	<insert id="add" parameterType="com.szy.entity.Subject">
+		INSERT INTO Subject(id,name,type,info,startTime,endTime,createTime) VALUES(NULL, #{name}, #{type}, #{info},#{startTime},#{endTime}, #{createTime})
+	</insert>
+	
+	<update id="edit" parameterType="com.szy.entity.Subject">
+		update Subject set name = #{name},type = #{type},info = #{info},startTime = #{startTime},endTime = #{endTime} where id = #{id}
+	</update>
+	
+	<update id="delete" parameterType="String">
+		delete from Subject where id in ${value}
+	</update>
+	
+	<update id="addOneVote" parameterType="long">
+		update Subject set voteNumber = voteNumber + 1 where id = ${value}
+	</update>
+	
+</mapper>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.szy.dao.VoteDao">
+	
+	
+	<resultMap id="voteResult" type="Vote">
+	    <!-- vote基础字段 -->
+	    <id property="id" column="v_id"/>
+	    <result property="userId" column="v_userId"/>
+	    <result property="subjectId" column="v_subjectId"/>
+	    <result property="subjectItemId" column="v_subjectItemId"/>
+	    <result property="createTime" column="v_create_time"/>
+	   <!-- 对应的subject实体对象 -->
+	    <association property="subject" javaType="Subject">
+	    	<id column="s_id" property="id"/>
+	    	<result property="name" column="s_name"/>
+		    <result property="type" column="s_type"/>
+		    <result property="info" column="s_info"/>
+		    <result property="voteNumber" column="s_vote_number"/>
+		    <result property="startTime" column="s_start_time"/>
+		    <result property="endTime" column="s_end_time"/>
+		    <result property="createTime" column="s_create_time"/>
+	  	</association>
+	  	 <!-- 对应的subjectItem实体对象 -->
+	  	<association property="subjectItem" javaType="SubjectItem">
+	    	<id property="id" column="si_id"/>
+	        <result property="subjectId" column="si_subject_id"/>
+	        <result property="title" column="si_title"/>
+	        <result property="voteNumber" column="si_vote_number"/>
+	        <result property="createTime" column="si_create_time"/>
+	  	</association>
+	  	 <!-- 对应的user实体对象 -->
+	  	<association property="user" javaType="User">
+	    	<id property="id" column="u_id"/>
+	        <result property="name" column="u_name"/>
+	        <result property="password" column="u_password"/>
+	        <result property="sex" column="u_sex"/>
+	        <result property="status" column="u_status"/>
+	        <result property="createTime" column="u_create_time"/>
+	  	</association>
+	</resultMap>
+	
+	<resultMap id="voteResultSingle" type="Vote">
+	    <!-- vote基础字段 -->
+	    <id property="id" column="v_id"/>
+	    <result property="userId" column="v_user_id"/>
+	    <result property="subjectId" column="v_subjectId"/>
+	    <result property="subjectItemId" column="v_subjectItemId"/>
+	    <result property="createTime" column="v_create_time"/>
+	   <!-- 对应的subject实体对象 -->
+	    <association property="subject" javaType="Subject">
+	    	<id column="s_id" property="id"/>
+	    	<result property="name" column="s_name"/>
+		    <result property="type" column="s_type"/>
+		    <result property="info" column="s_info"/>
+		    <result property="voteNumber" column="s_vote_number"/>
+		    <result property="startTime" column="s_start_time"/>
+		    <result property="endTime" column="s_end_time"/>
+		    <result property="createTime" column="s_create_time"/>
+	  	</association>
+	  	 <!-- 对应的user实体对象 -->
+	  	<association property="user" javaType="User">
+	    	<id property="id" column="u_id"/>
+	        <result property="name" column="u_name"/>
+	        <result property="password" column="u_password"/>
+	        <result property="sex" column="u_sex"/>
+	        <result property="status" column="u_status"/>
+	        <result property="createTime" column="u_create_time"/>
+	  	</association>
+	  	<!-- 对应的subjectItem实体对象集合 -->
+	  	 <collection property="subjectItems" ofType="SubjectItem">
+	        <id property="id" column="si_id"/>
+	        <result property="subjectId" column="si_subject_id"/>
+	        <result property="title" column="si_title"/>
+	        <result property="voteNumber" column="si_vote_number"/>
+	        <result property="createTime" column="si_create_time"/>
+	    </collection>
+	</resultMap>
+	
+	<select id="findList" parameterType="Map" resultMap="voteResult">
+		select
+			s.id as s_id,s.name as s_name,s.type as s_type,s.info as s_info,s.voteNumber as s_vote_number,s.startTime as s_start_time,s.endTime as s_end_time,s.createTime as s_create_time,
+			si.id as si_id,si.subjectId as si_subject_id,si.title as si_title,si.voteNumber as si_vote_number,si.createTime as si_create_time,
+			u.id as u_id,u.name as u_name,u.password as u_password,u.sex as u_sex,u.status as u_status,u.createTime as u_create_time,
+			v.id as v_id,v.subjectId as v_subjectId,v.subjectItemId as v_subjectItemId,v.createTime as v_create_time 
+			from subject s,subject_item si,user u,vote v 
+			where s.id = si.subjectId and s.id = v.subjectId and si.id = v.subjectItemId and v.userId = u.id 
+			<if test="subjectName != null">
+			 and s.name like #{subjectName} 
+			</if>
+			<if test="subjectItemTitle != null">
+			 and si.title like #{subjectItemTitle} 
+			</if>
+			<if test="username != null">
+			 and u.name like #{username} 
+			</if>
+			<if test="userId != null">
+			 and v.userId = #{userId} 
+			</if>
+			<if test="subjectId != null">
+			 and v.subjectId = #{subjectId} 
+			</if>
+			<if test="subjectItemId != null">
+			 and v.subjectItemId = #{subjectItemId} 
+			</if>
+			<if test="startIndex != null">
+			LIMIT #{startIndex}, #{pageSize} 
+			</if>
+	</select>
+	
+	<select id="findCollectList" parameterType="Map" resultMap="voteResultSingle">
+		select
+			s.id as s_id,s.name as s_name,s.type as s_type,s.info as s_info,s.voteNumber as s_vote_number,s.startTime as s_start_time,s.endTime as s_end_time,s.createTime as s_create_time,
+			si.id as si_id,si.subjectId as si_subject_id,si.title as si_title,si.voteNumber as si_vote_number,si.createTime as si_create_time,
+			u.id as u_id,u.password as u_password,u.sex as u_sex,u.status as u_status,u.createTime as u_create_time,
+			v.id as v_id,v.subjectId as v_subjectId,v.subjectItemId as v_subjectItemId,v.userId as v_user_id,v.createTime as v_create_time 
+			from subject s,subject_item si,user u,vote v 
+			where s.id = si.subjectId and s.id = v.subjectId and si.id = v.subjectItemId and v.userId = u.id 
+			<if test="subjectName != null">
+			 and s.name like #{subjectName} 
+			</if>
+			<if test="username != null">
+			 and u.name like #{username} 
+			</if>
+			<if test="userId != null">
+			 and v.userId = #{userId} 
+			</if>
+			<if test="subjectId != null">
+			 and v.subjectId = #{subjectId} 
+			</if>
+			<if test="subjectItemId != null">
+			 and v.subjectItemId = #{subjectItemId} 
+			</if>
+			group by v.subjectId 
+			<if test="startIndex != null">
+			LIMIT #{startIndex}, #{pageSize} 
+			</if>
+	</select>
+	
+	<select id="getTotal" parameterType="Map" resultType="int">
+		select count(*) 
+		from subject s,subject_item si,user u,vote v 
+			where s.id = si.subjectId and s.id = v.subjectId and si.id = v.subjectItemId and v.userId = u.id  
+			<if test="subjectName != null">
+			 and s.name like #{subjectName} 
+			</if>
+			<if test="subjectItemTitle != null">
+			 and si.title like #{subjectItemTitle} 
+			</if>
+			<if test="username != null">
+			 and u.name like #{username} 
+			</if>
+			<if test="userId != null">
+			 and v.userId = #{userId} 
+			</if>
+			<if test="subjectId != null">
+			 and v.subjectId = #{subjectId} 
+			</if>
+			<if test="subjectItemId != null">
+			 and v.subjectItemId = #{subjectItemId} 
+			</if> 
+	</select>
+	
+	<insert id="add" parameterType="com.szy.entity.Vote">
+		INSERT INTO vote(id,subjectId,subjectItemId,userId,createTime) VALUES(NULL, #{subjectId}, #{subjectItemId}, #{userId}, #{createTime})
+	</insert>
+	
+	
+	
+	
+</mapper>

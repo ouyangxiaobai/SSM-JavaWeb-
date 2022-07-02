@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.szy.dao.SubjectItemDao">
+	
+	
+	<select id="findByName" parameterType="Map" resultType="SubjectItem">
+		select * from subject_item where title like #{title} LIMIT #{startIndex}, #{pageSize} 
+	</select>
+	
+	<select id="getTotalByName" parameterType="Map" resultType="int">
+		select count(*) from subject_item where title like #{title}  
+	</select>
+	
+	<insert id="add" parameterType="com.szy.entity.SubjectItem">
+		INSERT INTO subject_item(id,title,subjectId,createTime) VALUES(NULL, #{title}, #{subjectId}, #{createTime})
+	</insert>
+	
+	<update id="edit" parameterType="com.szy.entity.SubjectItem">
+		update subject_item set title = #{title},subjectId = #{subjectId} where id = #{id}
+	</update>
+	
+	<update id="delete" parameterType="String">
+		delete from subject_item where id in ${value}
+	</update>
+	
+	<update id="addOneVote" parameterType="long">
+		update subject_item set voteNumber = voteNumber + 1 where id = ${value}
+	</update>
+</mapper>
